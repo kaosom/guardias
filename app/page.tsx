@@ -9,11 +9,13 @@ import { SearchBar } from "@/components/search-bar"
 import { ResultCard } from "@/components/result-card"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { FloatingActions } from "@/components/floating-actions"
-import { MOCK_RECORDS, type VehicleRecord } from "@/lib/types"
+import { type VehicleRecord } from "@/lib/types"
+import type { VehicleModalPayload } from "@/components/vehicle-modal"
 
-const VehicleModal = dynamic(() => import("@/components/vehicle-modal").then(mod => ({ default: mod.VehicleModal })), {
-  ssr: false,
-})
+const VehicleModal = dynamic(
+  () => import("@/components/vehicle-modal").then((mod) => ({ default: mod.VehicleModal })),
+  { ssr: false }
+)
 
 const CameraScanner = dynamic(() => import("@/components/camera-scanner").then(mod => ({ default: mod.CameraScanner })), {
   ssr: false,
@@ -55,43 +57,57 @@ export default function Home() {
     setMounted(true)
   }, [])
 
-  const handleSearch = useCallback((query: string) => {
+  const handleSearch = useCallback(async (query: string) => {
     setIsLoading(true)
     setNotFound(false)
     setResult(null)
     setQrAction(null)
-
-    setTimeout(() => {
-      const key = query.toUpperCase()
-      const found = MOCK_RECORDS[key] || MOCK_RECORDS[query]
-      if (found) {
-        setResult({ ...found })
+    const q = query.trim()
+    if (!q) {
+      setIsLoading(false)
+      return
+    }
+    try {
+      const res = await fetch(`/api/vehicles?q=${encodeURIComponent(q)}`)
+      if (res.ok) {
+        const data = await res.json()
+        setResult(data)
       } else {
         setNotFound(true)
       }
+    } catch {
+      setNotFound(true)
+    } finally {
       setIsLoading(false)
-    }, 600)
+    }
   }, [])
 
-  const handleConfirm = useCallback(() => {
-    if (result) {
-      setResult({
-        ...result,
-        status: result.status === "outside" ? "inside" : "outside",
-      })
+  const handleConfirm = useCallback(async () => {
+    if (!result?.id) {
+      setConfirmOpen(false)
+      return
     }
-    setConfirmOpen(false)
-    setQrAction(null)
+    const type = result.status === "outside" ? "entry" : "exit"
+    try {
+      const res = await fetch("/api/movements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vehicleId: result.id, type }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setResult({ ...result, status: data.newStatus })
+      }
+    } finally {
+      setConfirmOpen(false)
+      setQrAction(null)
+    }
   }, [result])
 
   const handleCameraCapture = useCallback((imageDataUrl: string) => {
     setCapturedImage(imageDataUrl)
     setCameraOpen(false)
-    
-    const simulatedPlates = ["TNA-1234", "UBZ-5678", "TPQ-123", "URX-9876"]
-    const detected = simulatedPlates[Math.floor(Math.random() * simulatedPlates.length)]
-    setDetectedPlate(detected)
-    
+    setDetectedPlate("")
     setOcrConfirmOpen(true)
   }, [])
 
@@ -131,6 +147,40 @@ export default function Home() {
     setModalMode(mode)
     setModalOpen(true)
   }, [])
+
+  const handleModalSave = useCallback(async (payload: VehicleModalPayload, id?: number) => {
+      const body = {
+        plate: payload.plate,
+        studentId: payload.studentId,
+        studentName: payload.studentName,
+        vehicleType: payload.vehicleType,
+        hasHelmet: payload.hasHelmet,
+        helmetCount: payload.helmetCount,
+        helmets: payload.helmets,
+        vehicleDescription: payload.vehicleDescription || undefined,
+        vehiclePhotoPath: payload.vehiclePhotoPath ?? null,
+      }
+      if (id != null) {
+        const res = await fetch(`/api/vehicles/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+        if (res.ok && result?.id === id) {
+          const data = await res.json()
+          setResult(data)
+        }
+      } else {
+        const res = await fetch("/api/vehicles", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+        if (res.ok) {
+          const data = await res.json()
+          setResult(data)
+        }
+      }
+    },
+    [result?.id]
+  )
+
+  const handleModalDelete = useCallback(async (id: number) => {
+    const res = await fetch(`/api/vehicles/${id}`, { method: "DELETE" })
+    if (res.ok && result?.id === id) setResult(null)
+  }, [result?.id])
 
   const isEntry = result?.status === "outside"
 
@@ -302,6 +352,9 @@ export default function Home() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         mode={modalMode}
+        initialRecord={modalMode !== "add" ? result : null}
+        onSave={handleModalSave}
+        onDelete={handleModalDelete}
       />
     </div>
   )

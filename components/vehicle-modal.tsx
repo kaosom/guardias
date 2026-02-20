@@ -18,17 +18,33 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Camera, X, HardHat, Plus, Minus, Bike, Car, AlertCircle, CheckCircle2 } from "lucide-react"
-import type { VehicleType } from "@/lib/types"
+import type { VehicleType, VehicleRecord } from "@/lib/types"
 import { formatPueblaPlate, formatMatricula, validatePlateWithMessage, validateMatriculaWithMessage } from "@/lib/validation"
+
+export type VehicleModalPayload = {
+  plate: string
+  studentId: string
+  studentName: string
+  vehicleType: VehicleType
+  hasHelmet: boolean
+  helmetCount: number
+  helmets: { description: string }[]
+  vehicleDescription: string
+  vehiclePhotoPath: string | null
+}
 
 interface VehicleModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: "add" | "edit" | "delete"
+  initialRecord?: VehicleRecord | null
+  onSave?: (payload: VehicleModalPayload, id?: number) => void | Promise<void>
+  onDelete?: (id: number) => void | Promise<void>
 }
 
-export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mode }: VehicleModalProps) {
+export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mode, initialRecord, onSave, onDelete }: VehicleModalProps) {
   const [plate, setPlate] = useState("")
+  const [studentName, setStudentName] = useState("")
   const [studentId, setStudentId] = useState("")
   const [vehicleType, setVehicleType] = useState<VehicleType>("moto")
   const [hasHelmet, setHasHelmet] = useState(false)
@@ -46,6 +62,7 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
   useEffect(() => {
     if (open && mode === "add") {
       setPlate("")
+      setStudentName("")
       setStudentId("")
       setVehicleType("moto")
       setHasHelmet(false)
@@ -57,6 +74,26 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
       setMatriculaError("")
     }
   }, [open, mode])
+
+  useEffect(() => {
+    if (open && mode !== "add" && initialRecord) {
+      setPlate(initialRecord.plate)
+      setStudentName(initialRecord.studentName)
+      setStudentId(initialRecord.studentId)
+      setVehicleType(initialRecord.vehicleType)
+      setHasHelmet(initialRecord.hasHelmet)
+      setHelmetCount(initialRecord.helmetCount)
+      setHelmetDescriptions(
+        initialRecord.helmets?.length
+          ? initialRecord.helmets.map((h) => h.description ?? "")
+          : [""]
+      )
+      setVehicleDescription(initialRecord.vehicleDescription ?? "")
+      setVehiclePhotoUrl(initialRecord.vehiclePhotoUrl ?? null)
+      setPlateError("")
+      setMatriculaError("")
+    }
+  }, [open, mode, initialRecord])
 
   useEffect(() => {
     if (plate) {
@@ -108,7 +145,7 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
     setStudentId(formatMatricula(e.target.value))
   }, [])
 
-  const isFormValid = !plateError && !matriculaError && plate && studentId
+  const isFormValid = !plateError && !matriculaError && plate && studentId && studentName.trim().length > 0
 
   const titles: Record<string, string> = {
     add: "Agregar vehículo",
@@ -179,6 +216,15 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
                       ? "border-success/50 focus:ring-success/10" 
                       : ""
                   }`}
+                />
+              </FieldGroup>
+
+              <FieldGroup label="Nombre del estudiante" hint="Nombre completo">
+                <Input
+                  placeholder="María García López"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  className="h-11 text-base rounded-xl"
                 />
               </FieldGroup>
 
@@ -337,15 +383,34 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
               <Button
                 variant="destructive"
                 className="w-full h-11 text-sm font-medium rounded-xl shadow-apple hover:shadow-apple-md active:scale-98 transition-all"
-                onClick={() => onOpenChange(false)}
+                onClick={async () => {
+                  if (initialRecord?.id != null && onDelete) {
+                    await onDelete(initialRecord.id)
+                    onOpenChange(false)
+                  }
+                }}
               >
                 Eliminar vehículo
               </Button>
             ) : (
               <Button
                 className="w-full h-11 text-sm font-medium rounded-xl bg-primary text-primary-foreground shadow-apple hover:shadow-apple-md active:scale-98 transition-all disabled:opacity-50"
-                onClick={() => onOpenChange(false)}
                 disabled={!isFormValid}
+                onClick={async () => {
+                  const payload: VehicleModalPayload = {
+                    plate,
+                    studentId,
+                    studentName: studentName.trim(),
+                    vehicleType,
+                    hasHelmet,
+                    helmetCount,
+                    helmets: helmetDescriptions.map((d) => ({ description: d })),
+                    vehicleDescription,
+                    vehiclePhotoPath: null,
+                  }
+                  if (onSave) await onSave(payload, initialRecord?.id)
+                  onOpenChange(false)
+                }}
               >
                 {mode === "add" ? "Agregar vehículo" : "Guardar cambios"}
               </Button>
