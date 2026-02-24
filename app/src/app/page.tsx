@@ -123,25 +123,41 @@ export default function Home() {
     setTimeout(() => setCameraOpen(true), 100)
   }, [])
 
-  // QR scan result
-  const handleQrScan = useCallback((data: string) => {
-    setQrOpen(false)
+  // QR scan result: soporta QR institucional (base64 + JSON con matricula) y formato directo JSON
+  const handleQrScan = useCallback(
+    async (data: string) => {
+      setQrOpen(false)
 
-    try {
-      const parsed = JSON.parse(data)
-      const searchKey = parsed.plate || parsed.studentId || data
-
-      if (parsed.action === "entry" || parsed.action === "exit") {
-        setQrAction(parsed.action)
+      const { parseInstitutionalQr } = await import("@/lib/qr-payload")
+      const parsed = await parseInstitutionalQr(data)
+      if (parsed) {
+        if (parsed.action === "entry" || parsed.action === "exit") {
+          setQrAction(parsed.action)
+        }
+        setExternalQuery(parsed.searchTerm)
+        setTimeout(() => handleSearch(parsed.searchTerm), 300)
+        return
       }
 
-      setExternalQuery(searchKey)
-      setTimeout(() => handleSearch(searchKey), 300)
-    } catch {
-      setExternalQuery(data)
-      setTimeout(() => handleSearch(data), 300)
-    }
-  }, [handleSearch])
+      // Fallback: JSON directo o valor crudo
+      try {
+        const obj = JSON.parse(data) as Record<string, unknown>
+        const searchKey =
+          (typeof obj.plate === "string" && obj.plate) ||
+          (typeof obj.studentId === "string" && obj.studentId) ||
+          data
+        if (obj.action === "entry" || obj.action === "exit") {
+          setQrAction(obj.action as "entry" | "exit")
+        }
+        setExternalQuery(searchKey)
+        setTimeout(() => handleSearch(searchKey), 300)
+      } catch {
+        setExternalQuery(data)
+        setTimeout(() => handleSearch(data), 300)
+      }
+    },
+    [handleSearch]
+  )
 
   const openModal = useCallback((mode: "add" | "edit" | "delete") => {
     setModalMode(mode)

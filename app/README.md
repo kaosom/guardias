@@ -106,6 +106,10 @@ MYSQL_DATABASE=guardias
 # Puedes generar uno con: openssl rand -base64 24
 JWT_SECRET=una_clave_secreta_larga_y_segura
 
+# QR institucional (opcional). Si el QR viene cifrado con AES-GCM, mismo secreto que genero el QR.
+# Si el QR es solo base64(JSON) con "matricula", no hace falta.
+# NEXT_PUBLIC_QR_SECRET=
+
 # Ruta donde se almacenan las fotos de vehiculos (obligatorio en produccion).
 # IMPORTANTE: debe estar FUERA de /public/ y del directorio de la app para que
 # Next.js no la sirva como archivo estatico.

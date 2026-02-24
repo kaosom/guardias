@@ -102,6 +102,7 @@ En `app/.env.local` pon las mismas variables de MySQL y el **mismo JWT_SECRET** 
 
 - **API_URL** — En desarrollo suele ser `http://localhost:3001`. En producción, si la API y la app están en el mismo servidor: `http://127.0.0.1:3001`. Next.js usa esta variable para enviar las peticiones de `/api/*` al servidor Express.
 - **UPLOAD_DIR** — Opcional en la app si solo sirves fotos desde la API; si la app también necesita saber la ruta, pon la misma que en la API.
+- **NEXT_PUBLIC_QR_SECRET** — Opcional. Para el lector de QR institucional: si el QR viene **solo en base64** (texto en base64 que al decodificar es un JSON con `matricula`), no hace falta. Si el QR viene **cifrado con AES-GCM**, pon aquí el mismo secreto con el que se generó el QR en Autoservicios (o el sistema que emita los códigos). La app decodifica o desencripta en el frontend y extrae la matrícula para buscar al vehículo.
 
 No subas estos archivos (`.env`, `.env.local`) al repositorio; ya están en el `.gitignore`.
 
