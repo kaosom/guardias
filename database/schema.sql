@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Esquema de base de datos para el sistema de guardias (entrada/salida de vehículos)
--- MySQL 8+. Orden: users (alumnos), vehicles, helmets, guards, movements.
+-- MySQL 8+. Orden: users (alumnos), vehicles, helmets, locations, guards, movements.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -57,8 +57,31 @@ CREATE TABLE IF NOT EXISTS helmets (
 COMMENT='Cascos por vehículo';
 
 -- -----------------------------------------------------------------------------
+-- Tabla: locations
+-- Planteles o lugares donde pueden estar asignados los guardias (ej. CU, CU2).
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS locations (
+  id TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(50) NOT NULL COMMENT 'Código corto del lugar, ej. CU, CU2',
+  name VARCHAR(255) NOT NULL COMMENT 'Nombre descriptivo del plantel',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_locations_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Planteles o lugares disponibles para asignar guardias';
+
+-- Valores iniciales de lugares. El administrador puede editarlos o añadir más.
+INSERT INTO locations (code, name)
+VALUES 
+  ('CU', 'Ciudad Universitaria'),
+  ('CU2', 'Ciudad Universitaria 2')
+ON DUPLICATE KEY UPDATE
+  name = VALUES(name);
+
+-- -----------------------------------------------------------------------------
 -- Tabla: guards
 -- Guardias de puerta y administradores. Contraseña en hash bcrypt.
+-- Cada guardia puede tener un puesto: puerta (gate) y plantel (location_id).
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS guards (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -67,12 +90,15 @@ CREATE TABLE IF NOT EXISTS guards (
   role ENUM('admin', 'guard') NOT NULL COMMENT 'Rol: admin o guardia',
   full_name VARCHAR(255) NOT NULL COMMENT 'Nombre completo',
   gate TINYINT UNSIGNED NULL COMMENT 'Número de puerta asignada (1-15), solo guardias',
+  location_id TINYINT UNSIGNED NULL COMMENT 'Plantel o lugar asignado (CU, CU2, etc.)',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uk_email (email),
-  KEY idx_role (role)
+  KEY idx_role (role),
+  KEY idx_location_id (location_id),
+  CONSTRAINT fk_guards_location FOREIGN KEY (location_id) REFERENCES locations (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Guardias de puerta y administradores';
+COMMENT='Guardias de puerta y administradores con su puesto (puerta y plantel)';
 
 -- -----------------------------------------------------------------------------
 -- Tabla: movements
@@ -90,4 +116,4 @@ CREATE TABLE IF NOT EXISTS movements (
   CONSTRAINT fk_movements_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
   CONSTRAINT fk_movements_guard FOREIGN KEY (guard_id) REFERENCES guards (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Registro de entradas y salidas al campus';
+COMMENT='Registro de entradas y salidas al campus por vehículo';
