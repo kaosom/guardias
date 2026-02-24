@@ -60,3 +60,4 @@ Thumbs.db
 # Certificados locales (desarrollo HTTPS)
 app/key.pem
 app/cert.pem
+.cursor/
