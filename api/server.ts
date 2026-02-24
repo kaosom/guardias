@@ -36,18 +36,18 @@ const app = express()
 const PORT = Number(process.env.PORT) || 3001
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? "https://localhost:3000"
 
-// ── Middlewares globales ──────────────────────────────────────────────────────
+// ── Middlewares globales
 app.use(
     cors({
         origin: FRONTEND_ORIGIN,
-        credentials: true, // Permite enviar/recibir cookies
+        credentials: true,
     })
 )
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-// ── Rutas ─────────────────────────────────────────────────────────────────────
+// ── Rutas
 app.use("/api/auth", authRouter)
 app.use("/api/vehicles", vehiclesRouter)
 app.use("/api/movements", movementsRouter)
@@ -55,20 +55,20 @@ app.use("/api/upload", uploadRouter)
 app.use("/api/photos", photosRouter)
 app.use("/api/admin", adminRouter)
 
-// ── Health check ──────────────────────────────────────────────────────────────
+// ── Health check
 app.get("/api/health", (_req: Request, res: Response) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() })
 })
 
-// ── 404 catch-all ─────────────────────────────────────────────────────────────
+// ── 404 catch-all 
 app.use((_req: Request, res: Response) => {
     res.status(404).json({ error: "Ruta no encontrada." })
 })
 
-// ── Arrancar servidor ─────────────────────────────────────────────────────────
+// ── Arrancar servidor 
 app.listen(PORT, () => {
-    console.log(`[api] 🚀 Servidor Express corriendo en http://localhost:${PORT}`)
-    console.log(`[api] 🌐 CORS permitido para: ${FRONTEND_ORIGIN}`)
+    console.log(`[API] Servidor en http://localhost:${PORT}`)
+    console.log(`[API] CORS permitido para: ${FRONTEND_ORIGIN}`)
 })
 
 export default app
