@@ -34,7 +34,7 @@ En Linux puedes instalar Node con nvm, fnm o el gestor que uses, y MySQL con el 
 Clona el repositorio en Git:
 
 ```bash
-git clone <url-del-repo> guardias
+git clone https://github.com/kaosom/guardias.git guardias
 cd guardias
 ```
 
