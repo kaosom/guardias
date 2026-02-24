@@ -1,0 +1,25 @@
+---
+description: Mantener el frontend alineado con la API y la base de datos
+alwaysApply: true
+---
+
+# Sincronizar frontend con API y base de datos
+
+En este proyecto (guardias) el frontend vive en `app/` (Next.js) y consume la API que está en `app/app/api/` y la lógica en `api/` y `database/`.
+
+## Regla
+
+Siempre que se cambien **endpoints de la API** o el **esquema o uso de la base de datos**:
+
+1. **Actualizar el frontend** para usar los endpoints y contratos reales:
+   - Búsqueda: `GET /api/vehicles?q=...` (sustituir MOCK_RECORDS / búsqueda local).
+   - Crear vehículo: `POST /api/vehicles` (body JSON o multipart con foto).
+   - Obtener/actualizar/eliminar: `GET/PUT/DELETE /api/vehicles/[id]`.
+   - Entrada/salida: `POST /api/movements` con `{ vehicleId, type: 'entry'|'exit' }`.
+   - Subir foto: `POST /api/upload` (multipart: file, plate o vehicleId).
+
+2. **Tipos**: Si la API o la BD devuelven campos nuevos o distintos (por ejemplo `id` en el vehículo), actualizar los tipos en `app/lib/types.ts` o donde se definan y usarlos en los componentes (page, vehicle-modal, confirm-dialog, etc.).
+
+3. **Manejo de errores**: En las llamadas `fetch` o en los handlers, comprobar `response.ok` y mostrar mensajes o estados de error al usuario cuando la API falle.
+
+No dejar el front usando solo mocks o datos locales cuando ya existan rutas y base de datos reales; en cada cambio de API o BD, revisar y ajustar el front para que use esos endpoints y datos.
