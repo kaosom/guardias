@@ -61,6 +61,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
             role: user.role,
             fullName: user.full_name,
             ...(user.gate != null && { gate: user.gate }),
+            ...(user.location_name != null && user.location_name !== "" && { locationName: user.location_name }),
         }
         const token = await createToken(sessionUser)
         res.cookie(COOKIE_NAME, token, COOKIE_OPTIONS)

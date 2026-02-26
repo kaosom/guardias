@@ -31,6 +31,7 @@ import movementsRouter from "./routes/movements"
 import uploadRouter from "./routes/upload"
 import photosRouter from "./routes/photos"
 import adminRouter from "./routes/admin"
+import usersRouter from "./routes/users"
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3001
@@ -54,6 +55,7 @@ app.use("/api/movements", movementsRouter)
 app.use("/api/upload", uploadRouter)
 app.use("/api/photos", photosRouter)
 app.use("/api/admin", adminRouter)
+app.use("/api/users", usersRouter)
 
 // ── Health check
 app.get("/api/health", (_req: Request, res: Response) => {

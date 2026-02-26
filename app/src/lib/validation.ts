@@ -1,4 +1,8 @@
-const VALID_FIRST_LETTERS = new Set(['T', 'U'])
+const VALID_FIRST_LETTERS = new Set([
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+  'N', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+])
+//Antes para valid solo era U Y T pero pongo ahorita todas
 const EXCLUDED_LETTERS = new Set(['I', 'Ñ', 'O', 'Q'])
 const VALID_LETTERS = new Set([
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
@@ -51,24 +55,19 @@ export function validatePueblaPlate(plate: string): boolean {
 }
 
 export function formatPueblaPlate(value: string): string {
+  // Solo normaliza: quita caracteres raros, mayúsculas y pone guion después de 3 chars.
+  // La validación real (T/U, letras permitidas, longitud) se hace en validatePlateWithMessage.
   const clean = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
-  
-  let letters = ''
-  let numbers = ''
-  
-  for (const char of clean) {
-    if (/[A-Z]/.test(char) && letters.length < 3) {
-      if (isValidPueblaLetter(char, letters.length)) {
-        letters += char
-      }
-    } else if (/\d/.test(char) && numbers.length < 4) {
-      numbers += char
-    }
+
+  if (!clean) return ''
+
+  const letters = clean.slice(0, 3)
+  const numbers = clean.slice(3, 7)
+
+  if (!numbers) {
+    return letters
   }
-  
-  if (!letters) return ''
-  if (!numbers) return letters
-  
+
   return `${letters}-${numbers}`
 }
 

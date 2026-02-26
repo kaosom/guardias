@@ -8,6 +8,8 @@ export interface SessionUser {
   role: "admin" | "guard"
   fullName: string
   gate?: number | null
+  /** Nombre del plantel asignado al guardia (opcional). */
+  locationName?: string | null
 }
 
 interface AuthContextValue {

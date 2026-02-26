@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+import { APP_LOCATIONS, getMaxGatesForLocationName } from "@/lib/locations"
 
 const BUAP_LOGO =
   "https://images.seeklogo.com/logo-png/25/2/buap-new-2-logo-png_seeklogo-253622.png"
@@ -33,7 +34,8 @@ export default function AdminPage() {
   const [addEmail, setAddEmail] = useState("")
   const [addPassword, setAddPassword] = useState("")
   const [addFullName, setAddFullName] = useState("")
-  const [addGate, setAddGate] = useState(1)
+  const [addGate, setAddGate] = useState("1")
+  const [addLocationName, setAddLocationName] = useState("")
   const [addError, setAddError] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -68,7 +70,12 @@ export default function AdminPage() {
           email: addEmail.trim(),
           password: addPassword,
           fullName: addFullName.trim(),
-          gate: Math.min(15, Math.max(1, addGate)),
+          gate: (() => {
+            const n = parseInt(addGate, 10)
+            const maxG = getMaxGatesForLocationName(addLocationName)
+            return Number.isNaN(n) ? 1 : Math.min(maxG, Math.max(1, n))
+          })(),
+          locationName: addLocationName.trim() || null,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -81,14 +88,15 @@ export default function AdminPage() {
       setAddEmail("")
       setAddPassword("")
       setAddFullName("")
-      setAddGate(1)
+      setAddGate("1")
+      setAddLocationName(APP_LOCATIONS[0]?.name ?? "")
       fetchGuards()
     } catch {
       setAddError("Error de conexión.")
     } finally {
       setSubmitting(false)
     }
-  }, [addEmail, addPassword, addFullName, addGate, fetchGuards])
+  }, [addEmail, addPassword, addFullName, addGate, addLocationName, fetchGuards])
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -187,7 +195,16 @@ export default function AdminPage() {
         )}
       </main>
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <Dialog
+        open={addOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open)
+          if (open) {
+            setAddLocationName(APP_LOCATIONS[0]?.name ?? "")
+            setAddGate("1")
+          }
+        }}
+      >
         <DialogContent className="max-w-[90vw] sm:max-w-sm rounded-2xl p-0 gap-0 bottom-4 top-auto translate-y-0 data-[state=open]:fade-zoom-in">
           <DialogHeader className="px-4 pt-4 pb-2 space-y-0.5">
             <DialogTitle className="text-base font-semibold tracking-tight">
@@ -242,6 +259,32 @@ export default function AdminPage() {
               />
             </div>
             <div className="space-y-1.5">
+              <label htmlFor="admin-add-location" className="text-xs font-medium text-foreground">
+                Plantel
+              </label>
+              <select
+                id="admin-add-location"
+                value={addLocationName}
+                onChange={(e) => {
+                  const name = e.target.value
+                  setAddLocationName(name)
+                  const maxG = getMaxGatesForLocationName(name)
+                  setAddGate((prev) => {
+                    const n = parseInt(prev, 10)
+                    return Number.isNaN(n) ? "1" : String(Math.min(maxG, Math.max(1, n)))
+                  })
+                }}
+                className="h-11 w-full rounded-xl border border-border/50 bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="">Sin plantel asignado</option>
+                {APP_LOCATIONS.map((loc) => (
+                  <option key={loc.id} value={loc.name}>
+                    {loc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
               <label htmlFor="admin-add-gate" className="text-xs font-medium text-foreground">
                 Puerta
               </label>
@@ -249,17 +292,27 @@ export default function AdminPage() {
                 id="admin-add-gate"
                 type="number"
                 min={1}
-                max={15}
+                max={getMaxGatesForLocationName(addLocationName)}
                 placeholder="1"
                 value={addGate}
                 onChange={(e) => {
-                  const v = parseInt(e.target.value, 10)
-                  if (!Number.isNaN(v)) setAddGate(Math.min(15, Math.max(1, v)))
+                  const raw = e.target.value
+                  if (raw === "") {
+                    setAddGate("")
+                    return
+                  }
+                  const v = parseInt(raw, 10)
+                  if (!Number.isNaN(v)) {
+                    const maxG = getMaxGatesForLocationName(addLocationName)
+                    setAddGate(String(Math.min(maxG, Math.max(1, v))))
+                  }
                 }}
                 className="h-11 rounded-xl"
                 required
               />
-              <p className="text-[11px] text-muted-foreground">Entre 1 y 15</p>
+              <p className="text-[11px] text-muted-foreground">
+                Entre 1 y {getMaxGatesForLocationName(addLocationName)}
+              </p>
             </div>
             {addError && (
               <p className="text-[11px] text-destructive font-medium">{addError}</p>

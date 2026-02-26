@@ -7,7 +7,7 @@
  */
 
 import { Router, Request, Response } from "express"
-import { search, create, getById, update, deleteVehicle } from "../vehicles"
+import { search, create, getById, update, deleteVehicle, listByStudentId } from "../vehicles"
 import type { VehicleInput } from "../vehicles"
 import { requireAuth, requireAdmin } from "../middleware/auth"
 
@@ -32,6 +32,22 @@ router.get("/", requireAuth, async (req: Request, res: Response): Promise<void> 
     } catch (err) {
         console.error("GET /api/vehicles error:", err)
         res.status(500).json({ error: "Error al buscar el vehículo." })
+    }
+})
+
+// GET /api/vehicles/student/:studentId — lista todos los vehículos de un alumno
+router.get("/student/:studentId", requireAuth, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const studentId = String(req.params.studentId ?? "").trim()
+        if (!studentId) {
+            res.status(400).json({ error: "Falta el parámetro studentId." })
+            return
+        }
+        const vehicles = await listByStudentId(studentId)
+        res.json(vehicles)
+    } catch (err) {
+        console.error("GET /api/vehicles/student/:studentId error:", err)
+        res.status(500).json({ error: "Error al listar vehículos del alumno." })
     }
 })
 

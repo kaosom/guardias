@@ -24,6 +24,7 @@ export {
   listGuards,
   getById as getUserById,
   createGuard,
+  updateGuard,
   deleteGuard,
   countAdmins,
   type GuardRow,
@@ -32,3 +33,5 @@ export {
 } from "./guards"
 
 export { findByMatricula, findOrCreateByMatriculaAndName, getById as getAlumnoById, type UserRow } from "./users"
+
+export { listLocations, type LocationRow } from "./locations"

@@ -43,6 +43,7 @@ export interface VehicleInput {
 function rowToRecord(row: VehicleRowWithUser, helmets: { description: string }[]): VehicleRecordWithId {
   return {
     id: row.id,
+    studentUserId: row.user_id,
     plate: row.plate,
     studentId: row.matricula,
     studentName: row.full_name,
@@ -150,6 +151,32 @@ export async function getByStudentId(studentId: string): Promise<VehicleRecordWi
   const row = Array.isArray(rows) ? rows[0] : null
   if (!row) return null
   return getById(row.id)
+}
+
+/**
+ * Lista todos los vehículos registrados para una matrícula de alumno.
+ */
+export async function listByStudentId(studentId: string): Promise<VehicleRecordWithId[]> {
+  const user = await findByMatricula(studentId)
+  if (!user) return []
+
+  const db = getDb()
+  const [rows] = await db.execute<VehicleRowWithUser[]>(
+    `${VEHICLE_SELECT} WHERE v.user_id = ? ORDER BY v.created_at DESC`,
+    [user.id]
+  )
+  const list = Array.isArray(rows) ? rows : []
+
+  if (!list.length) return []
+
+  // Para simplicidad y dado que un alumno suele tener pocos vehículos,
+  // reutilizamos getById para obtener cascos y foto normalizados.
+  const results: VehicleRecordWithId[] = []
+  for (const row of list) {
+    const full = await getById(row.id)
+    if (full) results.push(full)
+  }
+  return results
 }
 
 /**

@@ -159,17 +159,24 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
     setStudentId(formatMatricula(e.target.value))
   }, [])
 
-  const isFormValid = !plateError && !matriculaError && plate && studentId && studentName.trim().length > 0
+  const isAdd = mode === "add"
+  const isEdit = mode === "edit"
+
+  const isFormValid =
+    !plateError &&
+    (!isAdd || !matriculaError) &&
+    plate &&
+    (isAdd ? studentId && studentName.trim().length > 0 : true)
 
   const titles: Record<string, string> = {
-    add: "Agregar vehículo",
+    add: "Registrar estudiante y vehículo",
     edit: "Editar vehículo",
     delete: "Eliminar vehículo",
   }
 
   const descriptions: Record<string, string> = {
-    add: "Registra un nuevo vehículo en el sistema",
-    edit: "Modifica los datos del vehículo",
+    add: "Captura los datos del alumno y registra uno de sus vehículos.",
+    edit: "Modifica los datos del vehículo seleccionado.",
     delete: "Esta acción no se puede deshacer",
   }
 
@@ -189,58 +196,73 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              <FieldGroup 
-                label="Placa" 
-                hint="Puebla: T o U + 2 letras + 3-4 números"
-                error={plateError}
-                isValid={plate.length > 0 && !plateError}
-              >
-                <Input
-                  placeholder="TNA-123"
-                  value={plate}
-                  onChange={handlePlateChange}
-                  maxLength={8}
-                  className={`h-11 text-base font-mono tracking-widest uppercase rounded-xl transition-colors ${
-                    plateError 
-                      ? "border-destructive/50 focus:ring-destructive/10" 
-                      : plate 
-                      ? "border-success/50 focus:ring-success/10" 
-                      : ""
-                  }`}
-                />
-              </FieldGroup>
+            <div className="flex flex-col gap-4">
+              {/* Información del alumno (solo en alta) */}
+              {isAdd && (
+                <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-muted/10 px-3.5 py-3">
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                    Información del alumno
+                  </p>
 
-              <FieldGroup 
-                label="Matrícula del estudiante" 
-                hint="9 dígitos sin espacios (ej: 202161606)"
-                error={matriculaError}
-                isValid={studentId.length > 0 && !matriculaError}
-              >
-                <Input
-                  placeholder="202161606"
-                  value={studentId}
-                  onChange={handleMatriculaChange}
-                  maxLength={9}
-                  inputMode="numeric"
-                  className={`h-11 text-base font-mono tracking-wider rounded-xl transition-colors ${
-                    matriculaError 
-                      ? "border-destructive/50 focus:ring-destructive/10" 
-                      : studentId 
-                      ? "border-success/50 focus:ring-success/10" 
-                      : ""
-                  }`}
-                />
-              </FieldGroup>
+                  <FieldGroup label="Nombre del estudiante" hint="Nombre completo">
+                    <Input
+                      placeholder="María García López"
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      className="h-11 text-base rounded-xl"
+                    />
+                  </FieldGroup>
 
-              <FieldGroup label="Nombre del estudiante" hint="Nombre completo">
-                <Input
-                  placeholder="María García López"
-                  value={studentName}
-                  onChange={(e) => setStudentName(e.target.value)}
-                  className="h-11 text-base rounded-xl"
-                />
-              </FieldGroup>
+                  <FieldGroup
+                    label="Matrícula del estudiante"
+                    hint="9 dígitos sin espacios (ej: 202161606)"
+                    error={matriculaError}
+                    isValid={studentId.length > 0 && !matriculaError}
+                  >
+                    <Input
+                      placeholder="202161606"
+                      value={studentId}
+                      onChange={handleMatriculaChange}
+                      maxLength={9}
+                      inputMode="numeric"
+                      className={`h-11 text-base font-mono tracking-wider rounded-xl transition-colors ${
+                        matriculaError
+                          ? "border-destructive/50 focus:ring-destructive/10"
+                          : studentId
+                          ? "border-success/50 focus:ring-success/10"
+                          : ""
+                      }`}
+                    />
+                  </FieldGroup>
+                </div>
+              )}
+
+              {/* Información del vehículo */}
+              <div className="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card px-3.5 py-3">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
+                  Vehículo seleccionado
+                </p>
+
+                <FieldGroup 
+                  label="Placa" 
+                  hint="Puebla: T o U + 2 letras + 3-4 números"
+                  error={plateError}
+                  isValid={plate.length > 0 && !plateError}
+                >
+                  <Input
+                    placeholder="TNA-123"
+                    value={plate}
+                    onChange={handlePlateChange}
+                    maxLength={8}
+                    className={`h-11 text-base font-mono tracking-widest uppercase rounded-xl transition-colors ${
+                      plateError 
+                        ? "border-destructive/50 focus:ring-destructive/10" 
+                        : plate 
+                        ? "border-success/50 focus:ring-success/10" 
+                        : ""
+                    }`}
+                  />
+                </FieldGroup>
 
               <FieldGroup label="Tipo de vehículo">
                 <Select value={vehicleType} onValueChange={(v) => setVehicleType(v as VehicleType)}>
@@ -393,6 +415,7 @@ export const VehicleModal = memo(function VehicleModal({ open, onOpenChange, mod
                   )}
                 </div>
               )}
+              </div>
             </div>
           )}
 

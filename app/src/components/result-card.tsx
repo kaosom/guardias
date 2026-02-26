@@ -16,10 +16,17 @@ import { VEHICLE_TYPE_LABELS, type VehicleRecord } from "@/lib/types"
 
 interface ResultCardProps {
   record: VehicleRecord
-  onEdit?: () => void
+  onEditUser?: () => void
+  onEditVehicleInHeader?: () => void
+  showVehicleEditInHeader?: boolean
 }
 
-export const ResultCard = memo(function ResultCard({ record, onEdit }: ResultCardProps) {
+export const ResultCard = memo(function ResultCard({
+  record,
+  onEditUser,
+  onEditVehicleInHeader,
+  showVehicleEditInHeader,
+}: ResultCardProps) {
   const isInside = record.status === "inside"
   const vehicleLabel = VEHICLE_TYPE_LABELS[record.vehicleType] || record.vehicleType
   const VehicleIcon = record.vehicleType === "carro" ? Car : Bike
@@ -38,20 +45,24 @@ export const ResultCard = memo(function ResultCard({ record, onEdit }: ResultCar
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium ${
-            isInside
-              ? "bg-primary/8 text-primary"
-              : "bg-muted text-muted-foreground"
-          }`}>
-            {isInside ? <ArrowUpFromLine className="h-3.5 w-3.5" /> : <ArrowDownToLine className="h-3.5 w-3.5" />}
+          <div
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium ${
+              isInside ? "bg-primary/8 text-primary" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {isInside ? (
+              <ArrowUpFromLine className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowDownToLine className="h-3.5 w-3.5" />
+            )}
             {isInside ? "Dentro" : "Fuera"}
           </div>
-          {onEdit && (
+          {onEditUser && (
             <button
               type="button"
-              onClick={onEdit}
+              onClick={onEditUser}
               className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95 transition-all"
-              aria-label="Editar"
+              aria-label="Editar alumno"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -68,7 +79,19 @@ export const ResultCard = memo(function ResultCard({ record, onEdit }: ResultCar
           <span className="text-sm font-semibold text-foreground">{vehicleLabel}</span>
         </div>
         <div className="flex flex-col items-center py-3.5 px-2 bg-card">
-          <span className="text-[10px] text-muted-foreground font-medium mb-1.5">Placa</span>
+          <div className="flex items-center gap-1 mb-1.5">
+            <span className="text-[10px] text-muted-foreground font-medium">Placa</span>
+            {showVehicleEditInHeader && onEditVehicleInHeader && (
+              <button
+                type="button"
+                onClick={onEditVehicleInHeader}
+                className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                aria-label="Editar vehículo"
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+            )}
+          </div>
           <span className="text-base font-bold text-foreground tracking-wider font-mono">{record.plate}</span>
         </div>
         <div className="flex flex-col items-center py-3.5 px-2 bg-card">

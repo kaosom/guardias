@@ -59,3 +59,29 @@ export async function getById(id: number): Promise<UserRow | null> {
   const row = Array.isArray(rows) ? rows[0] : null
   return row ?? null
 }
+
+/**
+ * Actualiza nombre completo y matrícula de un alumno.
+ */
+export async function updateUser(
+  id: number,
+  data: { fullName: string; matricula: string }
+): Promise<UserRow | null> {
+  const db = getDb()
+  const digits = data.matricula.replace(/\D/g, "").slice(0, 12)
+  const name = data.fullName.trim() || "Sin nombre"
+
+  const [result] = await db.execute("UPDATE users SET matricula = ?, full_name = ? WHERE id = ?", [
+    digits,
+    name,
+    id,
+  ])
+
+  const affected =
+    typeof result === "object" && result !== null && "affectedRows" in result
+      ? Number((result as { affectedRows?: number }).affectedRows ?? 0)
+      : 0
+
+  if (affected === 0) return null
+  return getById(id)
+}

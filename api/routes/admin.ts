@@ -1,14 +1,17 @@
 /**
- * GET    /api/admin/guards             — Lista guardias (solo admin).
- * POST   /api/admin/guards             — Crea un guardia (solo admin).
- * DELETE /api/admin/guards/:id         — Elimina un guardia (solo admin).
+ * GET    /api/admin/guards               — Lista guardias (solo admin).
+ * POST   /api/admin/guards               — Crea un guardia (solo admin).
+ * PUT    /api/admin/guards/:id           — Actualiza un guardia (solo admin).
+ * DELETE /api/admin/guards/:id           — Elimina un guardia (solo admin).
  * GET    /api/admin/guards/:id/movements — Movimientos de un guardia (solo admin).
+ * GET    /api/admin/locations            — Lista planteles disponibles (solo admin).
  */
 
 import { Router, Request, Response } from "express"
 import bcrypt from "bcrypt"
-import { listGuards, createGuard, deleteGuard, getById as getUserById } from "../guards"
+import { listGuards, createGuard, deleteGuard, getById as getUserById, updateGuard } from "../guards"
 import { getByGuardId } from "../movements"
+import { listLocations } from "../locations"
 import { requireAdmin } from "../middleware/auth"
 
 const router = Router()
@@ -32,7 +35,7 @@ router.get("/guards", requireAdmin, async (_req: Request, res: Response): Promis
 // POST /api/admin/guards
 router.post("/guards", requireAdmin, async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password, fullName, gate } = req.body ?? {}
+        const { email, password, fullName, gate, locationName } = req.body ?? {}
         const emailStr = typeof email === "string" ? email.trim() : ""
         const passwordStr = typeof password === "string" ? password : ""
         const fullNameStr = typeof fullName === "string" ? fullName.trim() : ""
@@ -49,13 +52,56 @@ router.post("/guards", requireAdmin, async (req: Request, res: Response): Promis
         }
 
         const user = await createGuard(
-            { email: emailStr, password: passwordStr, fullName: fullNameStr, gate: gateNum },
+            { email: emailStr, password: passwordStr, fullName: fullNameStr, gate: gateNum, locationName },
             (plain) => bcrypt.hash(plain, 10)
         )
         res.status(201).json(user)
     } catch (err) {
         console.error("POST /api/admin/guards error:", err)
         res.status(500).json({ error: "Error al crear guardia." })
+    }
+})
+
+// PUT /api/admin/guards/:id
+router.put("/guards/:id", requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const guardId = parseId(req.params.id as string)
+        if (guardId === null) { res.status(400).json({ error: "Id no válido." }); return }
+
+        const { email, fullName, gate, locationName } = req.body ?? {}
+        const emailStr = typeof email === "string" ? email.trim() : ""
+        const fullNameStr = typeof fullName === "string" ? fullName.trim() : ""
+        let gateNum = gate != null ? Number(gate) : NaN
+        if (!Number.isInteger(gateNum) || gateNum < 1 || gateNum > 15) gateNum = 1
+
+        if (!emailStr || !fullNameStr) {
+            res.status(400).json({ error: "email y fullName son obligatorios." })
+            return
+        }
+
+        const existing = await getUserById(guardId)
+        if (!existing) { res.status(404).json({ error: "Guardia no encontrado." }); return }
+        if (existing.role !== "guard") {
+            res.status(400).json({ error: "No se puede editar un administrador desde aquí." })
+            return
+        }
+
+        const updated = await updateGuard({
+            id: guardId,
+            email: emailStr,
+            fullName: fullNameStr,
+            gate: gateNum,
+            locationName: locationName ?? null,
+        })
+        if (!updated) {
+            res.status(500).json({ error: "No se pudo actualizar el guardia." })
+            return
+        }
+
+        res.json(updated)
+    } catch (err) {
+        console.error("PUT /api/admin/guards/:id error:", err)
+        res.status(500).json({ error: "Error al actualizar guardia." })
     }
 })
 
@@ -96,6 +142,17 @@ router.get("/guards/:id/movements", requireAdmin, async (req: Request, res: Resp
     } catch (err) {
         console.error("GET /api/admin/guards/:id/movements error:", err)
         res.status(500).json({ error: "Error al listar movimientos." })
+    }
+})
+
+// GET /api/admin/locations
+router.get("/locations", requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const locations = await listLocations()
+        res.json(locations)
+    } catch (err) {
+        console.error("GET /api/admin/locations error:", err)
+        res.status(500).json({ error: "Error al listar planteles." })
     }
 })
 

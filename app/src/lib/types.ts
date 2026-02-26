@@ -12,6 +12,7 @@ export interface HelmetDetail {
 
 export interface VehicleRecord {
   id?: number
+  studentUserId?: number
   studentName: string
   studentId: string
   vehicleType: VehicleType
@@ -22,4 +23,10 @@ export interface VehicleRecord {
   vehicleDescription: string
   vehiclePhotoUrl: string | null
   status: "inside" | "outside"
+}
+
+export interface StudentVehicles {
+  studentName: string
+  studentId: string
+  vehicles: VehicleRecord[]
 }

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
-import { ArrowDownToLine, ArrowUpFromLine, SearchX, Car } from "lucide-react"
+import { ArrowDownToLine, ArrowUpFromLine, SearchX, Car, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GuardHeader } from "@/components/guard-header"
 import { SearchBar } from "@/components/search-bar"
@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog"
 import { FloatingActions } from "@/components/floating-actions"
 import { type VehicleRecord } from "@/lib/types"
 import type { VehicleModalPayload } from "@/components/vehicle-modal"
+import { UserEditDialog } from "@/components/user-edit-dialog"
 
 const VehicleModal = dynamic(
   () => import("@/components/vehicle-modal").then((mod) => ({ default: mod.VehicleModal })),
@@ -37,6 +38,7 @@ export default function Home() {
   const [showCameraPermission, setShowCameraPermission] = useState(false)
   const [cameraPermissionGranted, setCameraPermissionGranted] = useState(false)
   const [result, setResult] = useState<VehicleRecord | null>(null)
+  const [studentVehicles, setStudentVehicles] = useState<VehicleRecord[]>([])
   const [notFound, setNotFound] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -52,6 +54,7 @@ export default function Home() {
   const [detectedPlate, setDetectedPlate] = useState("")
 
   const [qrAction, setQrAction] = useState<"entry" | "exit" | null>(null)
+  const [userDialogOpen, setUserDialogOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -61,6 +64,7 @@ export default function Home() {
     setIsLoading(true)
     setNotFound(false)
     setResult(null)
+    setStudentVehicles([])
     setQrAction(null)
     const q = query.trim()
     if (!q) {
@@ -70,13 +74,27 @@ export default function Home() {
     try {
       const res = await fetch(`/api/vehicles?q=${encodeURIComponent(q)}`)
       if (res.ok) {
-        const data = await res.json()
+        const data: VehicleRecord = await res.json()
         setResult(data)
+
+        // Cargar todos los vehículos registrados para el mismo alumno
+        try {
+          const listRes = await fetch(`/api/vehicles/student/${encodeURIComponent(data.studentId)}`)
+          if (listRes.ok) {
+            const list: VehicleRecord[] = await listRes.json()
+            setStudentVehicles(list.length ? list : [data])
+          } else {
+            setStudentVehicles([data])
+          }
+        } catch {
+          setStudentVehicles([data])
+        }
       } else {
         setNotFound(true)
       }
     } catch {
       setNotFound(true)
+      setStudentVehicles([])
     } finally {
       setIsLoading(false)
     }
@@ -247,7 +265,85 @@ export default function Home() {
           {/* Result */}
           {result && !isLoading && (
             <div className="flex flex-col gap-3">
-              <ResultCard record={result} onEdit={() => openModal("edit")} />
+              <ResultCard
+                record={result}
+                onEditUser={() => {
+                  if (!result) return
+                  setUserDialogOpen(true)
+                }}
+                onEditVehicleInHeader={() => openModal("edit")}
+                showVehicleEditInHeader={studentVehicles.length <= 1}
+              />
+
+              {/* Lista de vehículos del mismo alumno */}
+              {studentVehicles.length > 1 && (
+                <div className="rounded-2xl border border-border/50 bg-card/60 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Vehículos registrados para este alumno
+                    </p>
+                    <span className="text-[11px] font-semibold text-foreground bg-muted px-2 py-0.5 rounded-full">
+                      {studentVehicles.length} en total
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {studentVehicles.map((v) => {
+                      const active = v.id === result.id
+                      const inside = v.status === "inside"
+                      return (
+                        <div
+                          key={v.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setResult(v)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault()
+                              setResult(v)
+                            }
+                          }}
+                          className={`w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-left transition-colors cursor-pointer ${
+                            active ? "bg-primary/8 border border-primary/30" : "bg-card border border-border/40"
+                          }`}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-foreground truncate">
+                              {v.plate} · {v.vehicleType === "carro" ? "Automóvil" : v.vehicleType === "moto" ? "Motocicleta" : "Bicicleta"}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground truncate">
+                              {inside ? "Dentro del campus" : "Fuera del campus"}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                inside
+                                  ? "bg-success/15 text-success"
+                                  : "bg-muted text-muted-foreground"
+                              }`}
+                            >
+                              {inside ? "Dentro" : "Fuera"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setResult(v)
+                                openModal("edit")
+                              }}
+                              className="inline-flex items-center gap-1 rounded-full border border-border/50 px-2 py-0.5 text-[10px] text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors"
+                              aria-label="Editar vehículo"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Editar
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* QR action indicator */}
               {qrAction && (
@@ -371,6 +467,43 @@ export default function Home() {
         initialRecord={modalMode !== "add" ? result : null}
         onSave={handleModalSave}
         onDelete={handleModalDelete}
+      />
+
+      <UserEditDialog
+        open={userDialogOpen}
+        onOpenChange={setUserDialogOpen}
+        initialName={result?.studentName ?? ""}
+        initialStudentId={result?.studentId ?? ""}
+        onSave={async ({ fullName, studentId }) => {
+          if (!result?.studentUserId) return
+          const res = await fetch(`/api/users/${result.studentUserId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fullName, studentId }),
+          })
+          if (!res.ok) return
+          const data = await res.json()
+          const newName = data.fullName as string
+          const newId = data.studentId as string
+
+          setResult((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  studentName: newName,
+                  studentId: newId,
+                }
+              : prev
+          )
+
+          setStudentVehicles((prev) =>
+            prev.map((v) => ({
+              ...v,
+              studentName: newName,
+              studentId: newId,
+            }))
+          )
+        }}
       />
     </div>
   )
