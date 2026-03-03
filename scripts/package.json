@@ -1,0 +1,20 @@
+{
+    "name": "guardias-scripts",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Scripts de mantenimiento del proyecto Guardias",
+    "scripts": {
+        "seed-admin": "cd ../app && npm run seed-admin"
+    },
+    "dependencies": {
+        "bcrypt": "*",
+        "mysql2": "*"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "*",
+        "@types/node": "*",
+        "tsx": "*",
+        "typescript": "*"
+    },
+    "notes": "Las dependencias reales están en app/node_modules. Este package.json sirve para que el IDE resuelva los tipos correctamente. Para instalar: cd scripts && npm install"
+}
