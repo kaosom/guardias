@@ -25,7 +25,7 @@ declare global {
         }
     }
 }
-
+// No importa la cantidad de caracteres, solo que sea un string y especificar (por seguridad)
 function getSecret(): Uint8Array {
     const secret = process.env.JWT_SECRET
     if (!secret || secret.length < 16) {

@@ -180,7 +180,8 @@ export async function listByStudentId(studentId: string): Promise<VehicleRecordW
 }
 
 /**
- * Busca por placa o matrícula.
+ * Busca por placa o matrícula. 
+ * TODO: ajustar para placas de autos con 7 caracteres
  */
 export async function search(query: string): Promise<VehicleRecordWithId | null> {
   const trimmed = query.trim()

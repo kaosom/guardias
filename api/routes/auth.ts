@@ -72,6 +72,8 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
     }
 })
 
+// Posible futura implementación de registro de usuarios (no desde la parte de admin, no implementado)
+
 // POST /api/auth/logout
 router.post("/logout", (_req: Request, res: Response): void => {
     res.cookie(COOKIE_NAME, "", { httpOnly: true, path: "/", maxAge: 0 })

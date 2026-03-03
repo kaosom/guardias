@@ -67,20 +67,16 @@ export async function saveVehiclePhoto(
   mimeType: string,
   identifier: string
 ): Promise<string> {
-  console.log(`[photos] 📷 Subiendo foto — identifier: "${identifier}", mimeType: ${mimeType}, bytes: ${buffer.length}`)
 
   if (!ALLOWED_TYPES.includes(mimeType)) {
-    console.error(`[photos] ❌ Tipo no permitido: ${mimeType}`)
     throw new Error("Tipo de archivo no permitido. Usa JPEG, PNG, WebP o GIF.")
   }
   if (buffer.length > MAX_SIZE_BYTES) {
-    console.error(`[photos] ❌ Archivo muy grande: ${buffer.length} bytes (max ${MAX_SIZE_BYTES})`)
     throw new Error("La imagen no puede superar 5 MB.")
   }
 
   const dir = getUploadDir()
   await mkdir(dir, { recursive: true })
-  console.log(`[photos] 📁 Carpeta asegurada: ${dir}`)
 
   const ext =
     mimeType === "image/jpeg" ? "jpg"
@@ -92,11 +88,8 @@ export async function saveVehiclePhoto(
   const filename = `${safeName}-${randomUUID()}.${ext}`
   const filePath = path.join(dir, filename)
 
-  console.log(`[photos] 💾 Escribiendo archivo en: ${filePath}`)
   await writeFile(filePath, buffer)
-  console.log(`[photos] ✅ Foto guardada exitosamente: ${filePath}`)
 
   const relativePath = path.join("vehicles", filename)
-  console.log(`[photos] 🔗 Ruta relativa guardada en BD: ${relativePath}`)
   return relativePath
 }
