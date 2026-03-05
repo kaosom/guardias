@@ -23,14 +23,19 @@ String? _safeBase64Decode(String raw) {
 bool _isBase64Like(String s) {
   final trimmed = s.trim();
   if (trimmed.isEmpty) return false;
-  return RegExp(r'^[A-Za-z0-9+/]+=*$').hasMatch(trimmed) && trimmed.length % 4 != 1;
+  return RegExp(r'^[A-Za-z0-9+/]+=*$').hasMatch(trimmed) &&
+      trimmed.length % 4 != 1;
 }
 
 String? _extractSearchTermFromObject(Map<String, dynamic> obj) {
-  final matricula = obj['matricula'];
-  if (matricula is String && matricula.trim().isNotEmpty) return matricula.trim();
   final studentId = obj['studentId'];
-  if (studentId is String && studentId.trim().isNotEmpty) return studentId.trim();
+  if (studentId is String && studentId.trim().isNotEmpty) {
+    return studentId.trim();
+  }
+  final matricula = obj['matricula'];
+  if (matricula is String && matricula.trim().isNotEmpty) {
+    return matricula.trim();
+  }
   final plate = obj['plate'];
   if (plate is String && plate.trim().isNotEmpty) return plate.trim();
   return null;
@@ -68,7 +73,10 @@ ParsedQrPayload? parseInstitutionalQrSync(String raw) {
   return null;
 }
 
-Future<ParsedQrPayload?> parseInstitutionalQr(String raw, {String secret = ""}) async {
+Future<ParsedQrPayload?> parseInstitutionalQr(
+  String raw, {
+  String secret = '',
+}) async {
   final syncResult = parseInstitutionalQrSync(raw);
   if (syncResult != null) return syncResult;
 
@@ -86,17 +94,15 @@ Future<ParsedQrPayload?> parseInstitutionalQr(String raw, {String secret = ""}) 
     final mac = rawBytes.sublist(rawBytes.length - 16);
 
     final keyBytes = sha256.convert(utf8.encode(secret)).bytes;
-    
+
     final keyObj = enc.Key(Uint8List.fromList(keyBytes));
     final ivObj = enc.IV(Uint8List.fromList(iv));
 
-    final encrypter = enc.Encrypter(
-      enc.AES(keyObj, mode: enc.AESMode.gcm)
-    );
+    final encrypter = enc.Encrypter(enc.AES(keyObj, mode: enc.AESMode.gcm));
 
     final combined = Uint8List.fromList([...ciphertext, ...mac]);
     final decrypted = encrypter.decrypt(enc.Encrypted(combined), iv: ivObj);
-    
+
     final obj = jsonDecode(decrypted) as Map<String, dynamic>;
     final searchTerm = _extractSearchTermFromObject(obj);
     if (searchTerm != null) {

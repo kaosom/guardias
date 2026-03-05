@@ -11,7 +11,8 @@ class CameraScannerScreen extends StatefulWidget {
   State<CameraScannerScreen> createState() => _CameraScannerScreenState();
 }
 
-class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTickerProviderStateMixin {
+class _CameraScannerScreenState extends State<CameraScannerScreen>
+    with SingleTickerProviderStateMixin {
   CameraController? _controller;
   bool _isReady = false;
   String? _error;
@@ -24,8 +25,13 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.1, end: 0.9).animate(CurvedAnimation(parent: _animController, curve: Curves.easeInOut));
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.1, end: 0.9).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
+    );
     _initCamera();
   }
 
@@ -36,10 +42,18 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
         setState(() => _error = 'No cameras found');
         return;
       }
-      final backCamera = cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.back, orElse: () => cameras.first);
-      _controller = CameraController(backCamera, ResolutionPreset.high, enableAudio: false);
+      final backCamera = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
+      _controller = CameraController(
+        backCamera,
+        ResolutionPreset.high,
+        enableAudio: false,
+      );
       await _controller!.initialize();
-      _hasTorch = _controller!.value.flashMode == FlashMode.torch || true; // Simplistic
+      _hasTorch =
+          _controller!.value.flashMode == FlashMode.torch || true; // Simplistic
       if (mounted) setState(() => _isReady = true);
     } catch (e) {
       if (mounted) setState(() => _error = 'Camera error: $e');
@@ -67,11 +81,11 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
   }
 
   Future<void> _capture() async {
-    if (_controller == null || !_isReady || _controller!.value.isTakingPicture) return;
+    if (_controller == null || !_isReady || _controller!.value.isTakingPicture)
+      return;
     try {
       final xf = await _controller!.takePicture();
-      // En una implementación real aquí haríamos un recorte basado en la máscara, 
-      // pero para emular, pasamos la imagen completa.
+      // TODO: recortar la imagen basada en la máscara
       widget.onCapture(xf.path);
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -84,28 +98,41 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
     if (_error != null) {
       return Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppBar(backgroundColor: Colors.black, elevation: 0, leading: IconButton(icon: const Icon(LucideIcons.x), onPressed: () => Navigator.pop(context))),
-        body: Center(child: Text(_error!, style: const TextStyle(color: Colors.white))),
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(LucideIcons.x),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: Center(
+          child: Text(_error!, style: const TextStyle(color: Colors.white)),
+        ),
       );
     }
 
     if (!_isReady || _controller == null) {
-      return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator(color: Colors.white)));
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
     }
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          SizedBox.expand(
-            child: CameraPreview(_controller!),
-          ),
-          
+          SizedBox.expand(child: CameraPreview(_controller!)),
+
           SafeArea(
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -113,10 +140,23 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                         icon: const Icon(LucideIcons.x, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      const Text('ESCANEAR PLACA', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      const Text(
+                        'ESCANEAR PLACA',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
                       if (_hasTorch)
                         IconButton(
-                          icon: Icon(_torchOn ? LucideIcons.flashlight : LucideIcons.flashlightOff, color: Colors.white),
+                          icon: Icon(
+                            _torchOn
+                                ? LucideIcons.flashlight
+                                : LucideIcons.flashlightOff,
+                            color: Colors.white,
+                          ),
                           onPressed: _toggleTorch,
                         )
                       else
@@ -132,7 +172,7 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                         size: Size.infinite,
                         painter: _PlateOverlayPainter(),
                       ),
-                      
+
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: LayoutBuilder(
@@ -140,7 +180,8 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                             final w = constraints.maxWidth;
                             final h = w * 0.4;
                             return SizedBox(
-                              width: w, height: h,
+                              width: w,
+                              height: h,
                               child: Stack(
                                 children: [
                                   _buildFrameCorners(context),
@@ -148,13 +189,26 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                                     animation: _animation,
                                     builder: (context, child) {
                                       return Positioned(
-                                        top: (_animation.value * h - 2).clamp(0.0, h),
-                                        left: 8, right: 8,
+                                        top: (_animation.value * h - 2).clamp(
+                                          0.0,
+                                          h,
+                                        ),
+                                        left: 8,
+                                        right: 8,
                                         child: Container(
                                           height: 2,
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).primaryColor.withOpacity(0.8),
-                                            boxShadow: [BoxShadow(color: Theme.of(context).primaryColor, blurRadius: 4)],
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor.withOpacity(0.8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Theme.of(
+                                                  context,
+                                                ).primaryColor,
+                                                blurRadius: 4,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       );
@@ -163,21 +217,42 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                                 ],
                               ),
                             );
-                          }
+                          },
                         ),
                       ),
-                      
+
                       Positioned(
                         bottom: 80,
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: const BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(20))),
-                              child: const Text('Alinea la placa dentro del marco', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: Colors.black45,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                              child: const Text(
+                                'Alinea la placa dentro del marco',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
                             const SizedBox(height: 8),
-                            const Text('Procura que haya buena iluminación', style: TextStyle(color: Colors.white38, fontSize: 10)),
+                            const Text(
+                              'Procura que haya buena iluminación',
+                              style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: 10,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -189,7 +264,8 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                   child: GestureDetector(
                     onTap: _capture,
                     child: Container(
-                      height: 64, width: 64,
+                      height: 64,
+                      width: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 3),
@@ -197,9 +273,16 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
                       ),
                       child: Center(
                         child: Container(
-                          height: 48, width: 48,
-                          decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                          child: Icon(LucideIcons.scanLine, color: Theme.of(context).primaryColor),
+                          height: 48,
+                          width: 48,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: Icon(
+                            LucideIcons.scanLine,
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
                       ),
                     ),
@@ -216,23 +299,52 @@ class _CameraScannerScreenState extends State<CameraScannerScreen> with SingleTi
   Widget _buildFrameCorners(BuildContext context) {
     return Stack(
       children: [
-        Positioned(top: 0, left: 0, child: _buildCorner(top: true, left: true, context: context)),
-        Positioned(top: 0, right: 0, child: _buildCorner(top: true, left: false, context: context)),
-        Positioned(bottom: 0, left: 0, child: _buildCorner(top: false, left: true, context: context)),
-        Positioned(bottom: 0, right: 0, child: _buildCorner(top: false, left: false, context: context)),
+        Positioned(
+          top: 0,
+          left: 0,
+          child: _buildCorner(top: true, left: true, context: context),
+        ),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: _buildCorner(top: true, left: false, context: context),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          child: _buildCorner(top: false, left: true, context: context),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: _buildCorner(top: false, left: false, context: context),
+        ),
       ],
     );
   }
 
-  Widget _buildCorner({required bool top, required bool left, required BuildContext context}) {
+  Widget _buildCorner({
+    required bool top,
+    required bool left,
+    required BuildContext context,
+  }) {
     return Container(
-      width: 20, height: 20,
+      width: 20,
+      height: 20,
       decoration: BoxDecoration(
         border: Border(
-          top: top ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          bottom: !top ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          left: left ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          right: !left ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
+          top: top
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          bottom: !top
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          left: left
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          right: !left
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
         ),
         borderRadius: BorderRadius.only(
           topLeft: top && left ? const Radius.circular(8) : Radius.zero,
@@ -255,12 +367,13 @@ class _PlateOverlayPainter extends CustomPainter {
       Path.combine(
         PathOperation.difference,
         Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
-        Path()
-          ..addRect(Rect.fromCenter(
+        Path()..addRect(
+          Rect.fromCenter(
             center: Offset(size.width / 2, size.height / 2),
             width: w,
             height: h,
-          ))
+          ),
+        ),
       ),
       paint,
     );

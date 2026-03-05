@@ -281,7 +281,7 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.slate100,
               borderRadius: AppRadius.xl,
             ),
@@ -326,7 +326,7 @@ class _ErrorBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.errorLight,
         borderRadius: AppRadius.lg,
       ),

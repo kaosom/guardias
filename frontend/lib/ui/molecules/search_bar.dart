@@ -123,19 +123,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   fontWeight: FontWeight.w400,
                   letterSpacing: 0,
                 ),
-                focusedBorder: UnderlineInputBorder(
+                focusedBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
-                border: UnderlineInputBorder(
+                border: const UnderlineInputBorder(
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
-                enabledBorder: UnderlineInputBorder(
+                enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
-                disabledBorder: UnderlineInputBorder(
+                disabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
-                errorBorder: UnderlineInputBorder(
+                errorBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
                 isDense: true,

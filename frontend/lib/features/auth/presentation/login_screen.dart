@@ -204,7 +204,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(LucideIcons.alertCircle,
+                                const Icon(LucideIcons.alertCircle,
                                     size: 14, color: AppColors.error),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -240,7 +240,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.shieldCheck,
+                    const Icon(LucideIcons.shieldCheck,
                         size: 12, color: AppColors.slate300),
                     const SizedBox(width: 6),
                     Text(

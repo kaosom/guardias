@@ -186,11 +186,11 @@ class ResultCard extends StatelessWidget {
                     const SizedBox(height: 12),
                   ],
                   if (record.hasHelmet && record.helmets.isNotEmpty) ...[
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(LucideIcons.hardHat, size: 14, color: Colors.grey),
-                        const SizedBox(width: 6),
-                        const Text('Cascos registrados', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.grey)),
+                        Icon(LucideIcons.hardHat, size: 14, color: Colors.grey),
+                        SizedBox(width: 6),
+                        Text('Cascos registrados', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.grey)),
                       ],
                     ),
                     const SizedBox(height: 8),

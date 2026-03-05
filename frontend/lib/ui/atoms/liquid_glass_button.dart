@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
-/// Clean floating action button — pill shaped, crisp borders, no glass gimmicks.
 class LiquidGlassButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
@@ -28,10 +27,14 @@ class _LiquidGlassButtonState extends State<LiquidGlassButton>
   @override
   void initState() {
     super.initState();
-    _ac = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
-    _scale = Tween<double>(begin: 1.0, end: 0.94).animate(
-      CurvedAnimation(parent: _ac, curve: Curves.easeOut),
+    _ac = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
     );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.94,
+    ).animate(CurvedAnimation(parent: _ac, curve: Curves.easeOut));
   }
 
   @override
@@ -45,15 +48,22 @@ class _LiquidGlassButtonState extends State<LiquidGlassButton>
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final Color bg     = widget.isAccent ? cs.primary : (isDark ? AppColors.slate700 : AppColors.white);
-    final Color border = widget.isAccent ? Colors.transparent : (isDark ? AppColors.darkBorder : AppColors.slate200);
-    final Color fg     = widget.isAccent ? cs.onPrimary : cs.onSurface;
+    final Color bg = widget.isAccent
+        ? cs.primary
+        : (isDark ? AppColors.slate700 : AppColors.white);
+    final Color border = widget.isAccent
+        ? Colors.transparent
+        : (isDark ? AppColors.darkBorder : AppColors.slate200);
+    final Color fg = widget.isAccent ? cs.onPrimary : cs.onSurface;
 
     return Tooltip(
       message: widget.tooltip ?? '',
       child: GestureDetector(
         onTapDown: (_) => _ac.forward(),
-        onTapUp: (_) { _ac.reverse(); widget.onPressed(); },
+        onTapUp: (_) {
+          _ac.reverse();
+          widget.onPressed();
+        },
         onTapCancel: () => _ac.reverse(),
         child: ScaleTransition(
           scale: _scale,
@@ -72,9 +82,7 @@ class _LiquidGlassButtonState extends State<LiquidGlassButton>
                 ),
               ],
             ),
-            child: Center(
-              child: Icon(widget.icon, color: fg, size: 20),
-            ),
+            child: Center(child: Icon(widget.icon, color: fg, size: 20)),
           ),
         ),
       ),

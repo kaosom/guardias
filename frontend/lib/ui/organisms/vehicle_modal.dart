@@ -364,7 +364,7 @@ class _VehicleModalState extends State<VehicleModal> {
                           const SizedBox(height: 8),
                           Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: AppColors.slate100,
                               borderRadius: AppRadius.lg,
                             ),
@@ -393,7 +393,7 @@ class _VehicleModalState extends State<VehicleModal> {
                             const SizedBox(height: 24),
                             Container(
                               padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: AppColors.slate50,
                                 borderRadius: AppRadius.lg,
                               ),
@@ -632,7 +632,7 @@ class _VehicleModalState extends State<VehicleModal> {
                                 onTap: _pickImage,
                                 child: Container(
                                   height: 100,
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: AppColors.slate50,
                                     borderRadius: AppRadius.lg,
                                   ),
@@ -674,10 +674,10 @@ class _VehicleModalState extends State<VehicleModal> {
             // Footer actions (Fixed at bottom)
             Container(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.white,
                 border: Border(top: BorderSide(color: AppColors.slate100)),
-                borderRadius: const BorderRadius.vertical(
+                borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(18),
                 ),
               ),
@@ -688,7 +688,7 @@ class _VehicleModalState extends State<VehicleModal> {
                         foregroundColor: AppColors.error,
                         elevation: 0,
                         minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: AppRadius.lg,
                         ),
                       ),
@@ -714,7 +714,7 @@ class _VehicleModalState extends State<VehicleModal> {
                             minimumSize: const Size(0, 52),
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             foregroundColor: AppColors.slate600,
-                            shape: RoundedRectangleBorder(
+                            shape: const RoundedRectangleBorder(
                               borderRadius: AppRadius.lg,
                             ),
                           ),
@@ -735,7 +735,7 @@ class _VehicleModalState extends State<VehicleModal> {
                               foregroundColor: AppColors.white,
                               elevation: 0,
                               minimumSize: const Size(double.infinity, 52),
-                              shape: RoundedRectangleBorder(
+                              shape: const RoundedRectangleBorder(
                                 borderRadius: AppRadius.lg,
                               ),
                               disabledBackgroundColor: AppColors.slate100,
@@ -807,7 +807,7 @@ class _VehicleModalState extends State<VehicleModal> {
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.errorLight,
           borderRadius: AppRadius.lg,
         ),

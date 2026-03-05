@@ -6,7 +6,7 @@ import 'core/router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: '.env');
   runApp(const ProviderScope(child: GuardiasApp()));
 }
 

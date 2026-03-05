@@ -11,12 +11,13 @@ class QrScannerScreen extends StatefulWidget {
   State<QrScannerScreen> createState() => _QrScannerScreenState();
 }
 
-class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProviderStateMixin {
+class _QrScannerScreenState extends State<QrScannerScreen>
+    with SingleTickerProviderStateMixin {
   final MobileScannerController controller = MobileScannerController(
     formats: [BarcodeFormat.qrCode],
     detectionSpeed: DetectionSpeed.normal,
   );
-  
+
   bool _isScanning = true;
   bool _hasTorch = false;
   late AnimationController _animationController;
@@ -29,15 +30,17 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.1, end: 0.9).animate(CurvedAnimation(
-      parent: _animationController, curve: Curves.easeInOut
-    ));
+    _animation = Tween<double>(begin: 0.1, end: 0.9).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
     _checkTorch();
   }
 
   Future<void> _checkTorch() async {
     // Torch state is managed via controller but we flag support via try-catch on startup
-    setState(() => _hasTorch = true); // mobile_scanner handles it implicitly via button mostly
+    setState(
+      () => _hasTorch = true,
+    ); // mobile_scanner handles it implicitly via button mostly
   }
 
   @override
@@ -68,12 +71,15 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
               }
             },
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -81,10 +87,23 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                         icon: const Icon(LucideIcons.x, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      const Text('ESCANEAR QR', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      const Text(
+                        'ESCANEAR QR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
                       if (_hasTorch)
                         IconButton(
-                          icon: Icon(_hasTorch ? LucideIcons.flashlight : LucideIcons.flashlightOff, color: Colors.white),
+                          icon: Icon(
+                            _hasTorch
+                                ? LucideIcons.flashlight
+                                : LucideIcons.flashlightOff,
+                            color: Colors.white,
+                          ),
                           onPressed: () => controller.toggleTorch(),
                         )
                       else
@@ -101,7 +120,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                         size: Size.infinite,
                         painter: ScannerOverlayPainter(),
                       ),
-                      
+
                       // Focus area frame
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -114,15 +133,31 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                                 animation: _animation,
                                 builder: (context, child) {
                                   return Positioned(
-                                    top: (_animation.value * MediaQuery.of(context).size.width - 96).clamp(0.0, double.infinity),
-                                    left: 12, right: 12,
+                                    top:
+                                        (_animation.value *
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.width -
+                                                96)
+                                            .clamp(0.0, double.infinity),
+                                    left: 12,
+                                    right: 12,
                                     child: Container(
-                                        height: 2,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).primaryColor.withValues(alpha: 0.8),
-                                          boxShadow: [BoxShadow(color: Theme.of(context).primaryColor, blurRadius: 8)],
-                                        ),
+                                      height: 2,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(
+                                          context,
+                                        ).primaryColor.withValues(alpha: 0.8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
+                                            blurRadius: 8,
+                                          ),
+                                        ],
                                       ),
+                                    ),
                                   );
                                 },
                               ),
@@ -130,18 +165,39 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                           ),
                         ),
                       ),
-                      
+
                       Positioned(
                         bottom: 80,
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: const BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.all(Radius.circular(20))),
-                              child: const Text('Alinea el QR dentro del marco', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: Colors.black45,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                              child: const Text(
+                                'Alinea el QR dentro del marco',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                            SizedBox(height: 8),
-                            Text('El estudiante genera su QR desde Autoservicios', style: TextStyle(color: Colors.white38, fontSize: 10)),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'El estudiante genera su QR desde Autoservicios',
+                              style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: 10,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -154,16 +210,19 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                     children: [
                       GestureDetector(
                         onTap: () {
-                          // Manual scan logic
-                           const demoQRs = [
-                            '{"studentId": "2024-0158", "plate": "ABC-1234", "action": "entry"}',
-                            '{"studentId": "2023-0342", "plate": "XYZ-5678", "action": "exit"}',
+                          // TEST QRS
+                          const demoQRs = [
+                            '{"studentId": "202161606", "plate": "ABC-1234", "action": "entry"}',
+                            '{"studentId": "111111111", "plate": "XYZ-5678", "action": "exit"}',
                           ];
                           Navigator.pop(context);
-                          widget.onScan(demoQRs[DateTime.now().millisecond % 2]);
+                          widget.onScan(
+                            demoQRs[DateTime.now().millisecond % 2],
+                          );
                         },
                         child: Container(
-                          height: 64, width: 64,
+                          height: 64,
+                          width: 64,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
@@ -171,15 +230,25 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                           ),
                           child: Center(
                             child: Container(
-                              height: 48, width: 48,
-                              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                              child: Icon(LucideIcons.qrCode, color: Theme.of(context).primaryColor),
+                              height: 48,
+                              width: 48,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                LucideIcons.qrCode,
+                                color: Theme.of(context).primaryColor,
+                              ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text('Pulsa para simular escaneo', style: TextStyle(color: Colors.white54, fontSize: 10)),
+                      const Text(
+                        'Pulsa para simular escaneo',
+                        style: TextStyle(color: Colors.white54, fontSize: 10),
+                      ),
                     ],
                   ),
                 ),
@@ -196,25 +265,54 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       builder: (context, constraints) {
         return Stack(
           children: [
-            Positioned(top: 0, left: 0, child: _buildCorner(top: true, left: true, context: context)),
-            Positioned(top: 0, right: 0, child: _buildCorner(top: true, left: false, context: context)),
-            Positioned(bottom: 0, left: 0, child: _buildCorner(top: false, left: true, context: context)),
-            Positioned(bottom: 0, right: 0, child: _buildCorner(top: false, left: false, context: context)),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: _buildCorner(top: true, left: true, context: context),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: _buildCorner(top: true, left: false, context: context),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              child: _buildCorner(top: false, left: true, context: context),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: _buildCorner(top: false, left: false, context: context),
+            ),
           ],
         );
-      }
+      },
     );
   }
 
-  Widget _buildCorner({required bool top, required bool left, required BuildContext context}) {
+  Widget _buildCorner({
+    required bool top,
+    required bool left,
+    required BuildContext context,
+  }) {
     return Container(
-      width: 32, height: 32,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         border: Border(
-          top: top ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          bottom: !top ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          left: left ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
-          right: !left ? BorderSide(color: Theme.of(context).primaryColor, width: 3) : BorderSide.none,
+          top: top
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          bottom: !top
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          left: left
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
+          right: !left
+              ? BorderSide(color: Theme.of(context).primaryColor, width: 3)
+              : BorderSide.none,
         ),
         borderRadius: BorderRadius.only(
           topLeft: top && left ? const Radius.circular(12) : Radius.zero,
@@ -235,12 +333,13 @@ class ScannerOverlayPainter extends CustomPainter {
       Path.combine(
         PathOperation.difference,
         Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
-        Path()
-          ..addRect(Rect.fromCenter(
+        Path()..addRect(
+          Rect.fromCenter(
             center: Offset(size.width / 2, size.height / 2),
             width: size.width - 96,
             height: size.width - 96,
-          ))
+          ),
+        ),
       ),
       paint,
     );
