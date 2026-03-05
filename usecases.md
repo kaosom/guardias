@@ -37,7 +37,7 @@ Caso de uso principal para el ingreso de vehículos portadores de credencial dig
 
 ---
 
-## CU-03 — Identificación por Reconocimiento Óptico de Placas (OCR)
+## CU-03 — Identificación por Reconocimiento Óptico de Placas (OCR) (Futura implementación con mejores equipos)
 
 **Actor principal:** Guardia de seguridad  
 **Precondición:** El vehículo porta una placa visible y legible. La cámara del dispositivo está operativa.
