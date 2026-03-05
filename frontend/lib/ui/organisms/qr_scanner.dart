@@ -226,7 +226,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                           ),
                           child: Center(
                             child: Container(
@@ -328,7 +328,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 class ScannerOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withOpacity(0.6);
+    final paint = Paint()..color = Colors.black.withValues(alpha: 0.6);
     canvas.drawPath(
       Path.combine(
         PathOperation.difference,

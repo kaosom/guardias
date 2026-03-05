@@ -18,7 +18,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController    = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -43,11 +43,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      final res = await ApiClient.post('/api/auth/login',
-          body: jsonEncode({
-            'email': _emailController.text.trim(),
-            'password': _passwordController.text,
-          }));
+      final res = await ApiClient.post(
+        '/api/auth/login',
+        body: jsonEncode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+        }),
+      );
 
       if (res.statusCode != 200) {
         final data = jsonDecode(res.body);
@@ -91,7 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Container(
                       width: 150,
                       height: 150,
-                      
+
                       padding: const EdgeInsets.all(8),
                       child: Image.asset(_buapLogoAsset, fit: BoxFit.contain),
                     ),
@@ -129,10 +131,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     border: Border.all(color: AppColors.slate200),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
-                      )
+                      ),
                     ],
                   ),
                   child: Form(
@@ -194,18 +196,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const SizedBox(height: 14),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.errorLight,
                               borderRadius: AppRadius.md,
                               border: Border.all(
-                                  color: AppColors.error.withOpacity(0.2)),
+                                color: AppColors.error.withValues(alpha: 0.2),
+                              ),
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(LucideIcons.alertCircle,
-                                    size: 14, color: AppColors.error),
+                                const Icon(
+                                  LucideIcons.alertCircle,
+                                  size: 14,
+                                  color: AppColors.error,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -225,7 +233,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 20),
 
                         PrimaryButton(
-                          text: _isLoading ? 'Iniciando sesión…' : 'Iniciar sesión',
+                          text: _isLoading
+                              ? 'Iniciando sesión…'
+                              : 'Iniciar sesión',
                           isLoading: _isLoading,
                           onPressed: _handleSubmit,
                         ),
@@ -240,8 +250,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(LucideIcons.shieldCheck,
-                        size: 12, color: AppColors.slate300),
+                    const Icon(
+                      LucideIcons.shieldCheck,
+                      size: 12,
+                      color: AppColors.slate300,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Acceso restringido al personal autorizado',

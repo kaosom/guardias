@@ -92,7 +92,7 @@ class AppTheme {
         height: 1.6,
       ),
       bodySmall: TextStyle(
-        color: base.withOpacity(0.65),
+        color: base.withValues(alpha: 0.65),
         fontWeight: FontWeight.w400,
         fontSize: 12,
       ),
@@ -103,7 +103,7 @@ class AppTheme {
         letterSpacing: 0.1,
       ),
       labelSmall: TextStyle(
-        color: base.withOpacity(0.6),
+        color: base.withValues(alpha: 0.6),
         fontWeight: FontWeight.w500,
         fontSize: 11,
         letterSpacing: 0.3,
@@ -241,8 +241,8 @@ class AppTheme {
           elevation: 0,
           backgroundColor: cs.primary,
           foregroundColor: cs.onPrimary,
-          disabledBackgroundColor: cs.primary.withOpacity(0.35),
-          disabledForegroundColor: cs.onPrimary.withOpacity(0.65),
+          disabledBackgroundColor: cs.primary.withValues(alpha: 0.35),
+          disabledForegroundColor: cs.onPrimary.withValues(alpha: 0.65),
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.md),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
           textStyle: GoogleFonts.inter(

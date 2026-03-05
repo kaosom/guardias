@@ -198,9 +198,9 @@ class _CameraScannerScreenState extends State<CameraScannerScreen>
                                         child: Container(
                                           height: 2,
                                           decoration: BoxDecoration(
-                                            color: Theme.of(
-                                              context,
-                                            ).primaryColor.withOpacity(0.8),
+                                            color: Theme.of(context)
+                                                .primaryColor
+                                                .withValues(alpha: 0.8),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Theme.of(
@@ -269,7 +269,7 @@ class _CameraScannerScreenState extends State<CameraScannerScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 3),
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                       ),
                       child: Center(
                         child: Container(
@@ -360,7 +360,7 @@ class _CameraScannerScreenState extends State<CameraScannerScreen>
 class _PlateOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withOpacity(0.55);
+    final paint = Paint()..color = Colors.black.withValues(alpha: 0.55);
     final w = size.width - 64; // horizontal padding 32 * 2
     final h = w * 0.4; // aspect ratio matching the frame
     canvas.drawPath(

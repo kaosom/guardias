@@ -1061,7 +1061,9 @@ class _AddEditGuardFormState extends State<_AddEditGuardForm> {
                   decoration: BoxDecoration(
                     color: AppColors.errorLight,
                     borderRadius: AppRadius.md,
-                    border: Border.all(color: AppColors.error.withOpacity(0.2)),
+                    border: Border.all(
+                      color: AppColors.error.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Text(
                     _error,
