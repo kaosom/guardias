@@ -504,9 +504,8 @@ class _GateModal extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   final String label;
   final String? value;
-  final Widget? valueWidget;
 
-  const _InfoRow({required this.label, this.value, this.valueWidget});
+  const _InfoRow({required this.label, this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -523,15 +522,14 @@ class _InfoRow extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          valueWidget ??
-              Text(
-                value ?? '',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.slate700,
-                ),
-              ),
+          Text(
+            value ?? '',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.slate700,
+            ),
+          ),
         ],
       ),
     );
