@@ -12,33 +12,25 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) {
       if (authState.isLoading) return null;
-      
+
       final isLoggingIn = state.uri.path == '/login';
       final isLoggedIn = authState.user != null;
 
       if (!isLoggedIn && !isLoggingIn) return '/login';
       if (isLoggedIn && isLoggingIn) return '/';
-      
+
       // Admin protection
-      if (state.uri.path.startsWith('/admin') && authState.user?.role != 'admin') {
+      if (state.uri.path.startsWith('/admin') &&
+          authState.user?.role != 'admin') {
         return '/';
       }
 
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/admin',
-        builder: (context, state) => const AdminScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/admin', builder: (context, state) => const AdminScreen()),
     ],
   );
 });

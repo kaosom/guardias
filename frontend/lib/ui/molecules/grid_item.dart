@@ -32,18 +32,30 @@ class GridItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: Colors.grey)),
-                if (headerAccessory != null) ...[const SizedBox(width: 4), headerAccessory!]
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+                if (headerAccessory != null) ...[
+                  const SizedBox(width: 4),
+                  headerAccessory!,
+                ],
               ],
             ),
             const SizedBox(height: 2),
             if (valueText != null || value != null)
               Text(
-                valueText ?? value ?? '', 
+                valueText ?? value ?? '',
                 style: TextStyle(
-                  fontSize: isMono ? 16 : 14, 
-                  fontWeight: FontWeight.bold, 
-                  color: valueColor ?? Theme.of(context).textTheme.bodyLarge?.color,
+                  fontSize: isMono ? 16 : 14,
+                  fontWeight: FontWeight.bold,
+                  color:
+                      valueColor ??
+                      Theme.of(context).textTheme.bodyLarge?.color,
                   fontFamily: isMono ? 'monospace' : null,
                   letterSpacing: isMono ? 1.5 : null,
                 ),
