@@ -5,6 +5,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --experimental-https --experimental-https-key key.pem --experimental-https-cert cert.pem",
+    "dev:http": "next dev -p 3000",
     "lint": "eslint .",
     "start": "next start",
     "seed-admin": "tsx ../scripts/seed-admin.ts"

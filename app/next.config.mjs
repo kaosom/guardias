@@ -20,7 +20,7 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-select'],
-    allowedDevOrigins: ['192.168.100.13'],
+    allowedDevOrigins: ['192.168.100.13', 'localhost'],
   },
   reactStrictMode: true,
 }

@@ -37,10 +37,19 @@ const app = express()
 const PORT = Number(process.env.PORT) || 3001
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? "https://localhost:3000"
 
+// En desarrollo aceptamos cualquier origen de localhost (Flutter dev server, Next.js, etc.)
+const corsOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('https://localhost') || origin === FRONTEND_ORIGIN) {
+        callback(null, true)
+    } else {
+        callback(null, origin === FRONTEND_ORIGIN)
+    }
+}
+
 // ── Middlewares globales
 app.use(
     cors({
-        origin: FRONTEND_ORIGIN,
+        origin: corsOrigin,
         credentials: true,
     })
 )
